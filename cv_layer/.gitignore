@@ -1,0 +1,10 @@
+data/*
+!data/.gitkeep
+__pycache__/
+*.pyc
+runs/
+checkpoints/
+review_queue/
+wandb/
+mlruns/
+.pytest_cache/

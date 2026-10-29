@@ -1,0 +1,29 @@
+# Stage 0 — ingestion and preprocessing (spec §4)
+ingestion:
+  min_side_px: 224            # reject images smaller than this on either side
+  extensions: [".jpg", ".jpeg", ".png", ".heic", ".heif"]
+resize:
+  max_long_edge: 2048         # Lanczos downscale above this
+tiling:
+  enabled: true
+  trigger_long_edge: 1536     # tile when long edge exceeds this ...
+  trigger_box_count: 15       # ... or first pass returns more boxes than this
+  tile_size: 512
+  overlap_ratio: 0.20
+  merge_nms_iou: 0.45
+augmentation:                 # classifier training only (spec §4.4)
+  seed: 0
+  brightness_limit: 0.3
+  contrast_limit: 0.3
+  hue_shift_limit: 10         # hard cap — forbidden to exceed
+  sat_shift_limit: 20
+  val_shift_limit: 20
+  rotate_limit: 30
+  noise_var_limit: [10.0, 50.0]
+  motion_blur_limit: [3, 7]
+  shadow_p: 0.1
+  sun_flare_p: 0.05
+  dropout_max_holes: 2
+  dropout_max_fraction: 0.15
+  p_geometric: 0.5
+  p_photometric: 0.5

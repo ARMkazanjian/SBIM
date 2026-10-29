@@ -1,0 +1,49 @@
+# End-to-end orchestration, gating, features, output (spec §3, §8, §9, §10)
+schema_version: "1.0"
+seed: 42
+paths:
+  detector_config: configs/detector.yaml
+  classifier_config: configs/classifier.yaml
+  preprocessing_config: configs/preprocessing.yaml
+  classifier_checkpoint: runs/classifier/best.pt
+  calibration_file: runs/classifier/calibration.json
+  review_dir: review_queue
+  decision_record: runs/detector_decision.json
+gating:
+  alpha: 0.4
+  accept_threshold: 0.75
+  low_conf_threshold: 0.45
+  calibrate: true
+features:
+  nn_index_split: 1.0               # Clark-Evans R < split => clustered, else dispersed (schema has two states)
+  min_points_for_distribution: 3
+  scale_pixels_per_cm: null         # null => density is null, scale_known false
+life_stage:
+  enabled: true                     # forced false at runtime if checkpoint has no life-stage head
+logging:
+  level: INFO
+  json: true
+acceptance:                         # field-only test set (spec §12.4)
+  detection_recall: 0.80
+  detection_precision: 0.90
+  count_mae: 3.15
+  macro_f1: 0.85
+  confusion_pair_accuracy: 0.75
+  empty_fpr: 0.05
+  ece: 0.05
+  total_inference_ms: 2000
+dataset:
+  image_dir: /home/garik/Downloads/all_images   # flat folder of images, all formats
+  coco_path: data/annotations/all.json          # written by scripts/build_dataset.py, read by every other script
+  folder:                                       # how build_dataset.py derives metadata from filenames (first match wins)
+    session_rules:                              # capture-session grouping; unmatched files are their own session
+      - {pattern: '^(AdltStnkBug_\d+)_', value: '\1'}   # _3500/_4500/_5500 frames of one specimen set stay together
+    domain_rules:
+      - {pattern: '^(AdltStnkBug_|IMG_)', value: lab}     # controlled white-background lab imagery
+    default_domain: field                       # everything else: web / in-situ photographs
+    labels_csv: null                            # optional CSV: file_name,species[,life_stage]  (image-level labels)
+    label_rules: []                             # optional [{pattern: <regex on file name>, value: <species>}]
+  min_field_fraction_train: 0.40
+  min_field_fraction_test: 0.60   # test set must be predominantly field imagery (spec §11.2)
+  split: {train: 0.70, val: 0.15, test: 0.15}
+  seed: 42

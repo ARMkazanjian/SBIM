@@ -1,0 +1,41 @@
+# Stage 1 / 1.5 — Grounding DINO detection and box post-processing (spec §5, §6)
+model:
+  name: grounding-dino-base
+  hf_id: IDEA-Research/grounding-dino-base
+  revision: 12bdfa3120f3e7ec7b434d90674b3396eccf88eb   # pinned commit of IDEA-Research/grounding-dino-base (spec §5.1); never track main
+  allow_unpinned_revision: false
+  device: auto                # auto | cpu | cuda
+prompt:
+  selected: "stink bug . shield bug ."   # replace with ablation winner (prompt_ablation.py)
+  ablation_scores: {}                    # filled in from prompt_ablation.py output
+  candidates:
+    - "stink bug ."
+    - "stink bug . shield bug ."
+    - "insect . bug ."
+    - "stink bug . beetle . insect ."
+    - "small green insect . small brown insect ."
+    - "shield-shaped insect on leaf ."
+thresholds:
+  box_threshold: 0.25
+  text_threshold: 0.25
+  box_sweep: [0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45]
+  text_sweep: [0.15, 0.20, 0.25, 0.30, 0.35, 0.40]
+postprocess:
+  nms_iou: 0.45               # tune 0.35-0.55
+  min_area_frac: 0.0002       # 0.02% of image
+  max_area_frac: 0.25
+  max_aspect: 3.0             # orientation-free length:width upper bound (bugs appear at any rotation)
+  edge_margin_px: 2           # box within this many px of border => partial
+  partial_conf_weight: 0.85   # down-weight detection confidence of partial boxes
+  crop_padding: 0.15
+decision_gate:                # spec §5.3
+  ship_zero_shot_recall: 0.85
+  finetune_recall_floor: 0.70
+  eval_iou: 0.5
+finetune:
+  lr: 1.0e-5
+  epochs: 5
+  batch_size: 2
+  patience: 2
+  freeze: [backbone, text_encoder]
+  output_dir: runs/detector_finetune

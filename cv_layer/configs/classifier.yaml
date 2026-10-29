@@ -1,0 +1,60 @@
+# Stage 2 — species classifier (spec §7)
+model:
+  backbone: efficientnetv2_s     # timm name resolved via aliases in src/classification/model.py
+  name: efficientnetv2_s_384
+  input_size: 384
+  pretrained: true
+  drop_rate: 0.2
+  life_stage_head: true          # shared-backbone binary head (nymph vs adult)
+classes:
+  species: [rbsb, sgsb, gsb, bmsb, bsb, other_pentatomid]   # 'uncertain' is never trained
+  scientific_names:
+    rbsb: Piezodorus guildinii
+    sgsb: Nezara viridula
+    gsb: Chinavia hilaris
+    bmsb: Halyomorpha halys
+    bsb: Euschistus servus
+    other_pentatomid: null
+    uncertain: null
+  life_stages: [adult, nymph]
+  confusion_pairs:
+    - [sgsb, gsb]
+    - [bmsb, bsb]
+    - [rbsb, other_pentatomid]
+train:
+  optimizer: adamw
+  weight_decay: 0.01
+  lr_head: 3.0e-4
+  lr_backbone: 3.0e-5
+  warmup_epochs: 3
+  batch_size: 32
+  grad_accum_steps: 1
+  epochs: 100
+  patience: 15
+  label_smoothing: 0.1
+  imbalance: weighted_sampler    # weighted_sampler | class_weighted_loss  (exactly one)
+  amp: true
+  ema_decay: 0.9998
+  phase1_head_only_epochs: 5
+  num_workers: 4
+  seed: 42
+  life_stage_loss_weight: 0.3
+  min_labeled_nymphs: 200        # below this the life-stage head ships disabled (spec §7.5)
+  output_dir: runs/classifier
+hard_negative:
+  oversample_factor: 3
+  max_rounds: 2
+  review_sample_size: 50
+calibration:
+  max_iter: 200
+  n_bins: 15
+  ece_target: 0.05
+benchmark_backbones:
+  - {name: efficientnetv2_s_384, backbone: efficientnetv2_s, input_size: 384}
+  - {name: convnext_tiny_384, backbone: convnext_tiny, input_size: 384}
+  - {name: vit_base_patch16_384, backbone: vit_base_patch16_384, input_size: 384}
+  - {name: efficientnet_b3_320, backbone: efficientnet_b3, input_size: 320}
+resolution_ablation: [224, 320, 384]
+tracking:
+  backend: jsonl                 # jsonl | wandb | mlflow
+  project: sbim-cv-layer

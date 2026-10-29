@@ -1,0 +1,404 @@
+{
+  "$defs": {
+    "Aggregates": {
+      "additionalProperties": false,
+      "properties": {
+        "total_count": {
+          "minimum": 0,
+          "title": "Total Count",
+          "type": "integer"
+        },
+        "count_by_species": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Count By Species",
+          "type": "object"
+        },
+        "density": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Density"
+        },
+        "scale_known": {
+          "title": "Scale Known",
+          "type": "boolean"
+        },
+        "spatial_distribution": {
+          "anyOf": [
+            {
+              "enum": [
+                "clustered",
+                "dispersed"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Spatial Distribution"
+        },
+        "mean_detection_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mean Detection Confidence"
+        },
+        "mean_classification_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mean Classification Confidence"
+        },
+        "partial_detections": {
+          "minimum": 0,
+          "title": "Partial Detections",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total_count",
+        "count_by_species",
+        "scale_known",
+        "partial_detections"
+      ],
+      "title": "Aggregates",
+      "type": "object"
+    },
+    "DetectionOut": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minimum": 0,
+          "title": "Id",
+          "type": "integer"
+        },
+        "bbox": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Bbox",
+          "type": "array"
+        },
+        "bbox_format": {
+          "const": "xyxy_absolute",
+          "default": "xyxy_absolute",
+          "title": "Bbox Format",
+          "type": "string"
+        },
+        "detection_confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Detection Confidence",
+          "type": "number"
+        },
+        "species": {
+          "title": "Species",
+          "type": "string"
+        },
+        "species_scientific": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Species Scientific"
+        },
+        "classification_confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Classification Confidence",
+          "type": "number"
+        },
+        "fused_confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Fused Confidence",
+          "type": "number"
+        },
+        "life_stage": {
+          "default": "unknown",
+          "enum": [
+            "adult",
+            "nymph",
+            "unknown"
+          ],
+          "title": "Life Stage",
+          "type": "string"
+        },
+        "life_stage_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Life Stage Confidence"
+        },
+        "partial": {
+          "title": "Partial",
+          "type": "boolean"
+        },
+        "flag": {
+          "anyOf": [
+            {
+              "const": "low_confidence",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Flag"
+        }
+      },
+      "required": [
+        "id",
+        "bbox",
+        "detection_confidence",
+        "species",
+        "classification_confidence",
+        "fused_confidence",
+        "partial"
+      ],
+      "title": "DetectionOut",
+      "type": "object"
+    },
+    "GPS": {
+      "additionalProperties": false,
+      "properties": {
+        "lat": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lon": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Lon",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lon"
+      ],
+      "title": "GPS",
+      "type": "object"
+    },
+    "InferenceMs": {
+      "additionalProperties": false,
+      "properties": {
+        "detection": {
+          "minimum": 0,
+          "title": "Detection",
+          "type": "number"
+        },
+        "classification": {
+          "minimum": 0,
+          "title": "Classification",
+          "type": "number"
+        },
+        "total": {
+          "minimum": 0,
+          "title": "Total",
+          "type": "number"
+        }
+      },
+      "required": [
+        "detection",
+        "classification",
+        "total"
+      ],
+      "title": "InferenceMs",
+      "type": "object"
+    },
+    "Processing": {
+      "additionalProperties": false,
+      "properties": {
+        "detector": {
+          "title": "Detector",
+          "type": "string"
+        },
+        "detector_prompt": {
+          "title": "Detector Prompt",
+          "type": "string"
+        },
+        "classifier": {
+          "title": "Classifier",
+          "type": "string"
+        },
+        "tiled_inference": {
+          "title": "Tiled Inference",
+          "type": "boolean"
+        },
+        "inference_ms": {
+          "$ref": "#/$defs/InferenceMs"
+        }
+      },
+      "required": [
+        "detector",
+        "detector_prompt",
+        "classifier",
+        "tiled_inference",
+        "inference_ms"
+      ],
+      "title": "Processing",
+      "type": "object"
+    },
+    "SourceMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "original_dimensions": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Original Dimensions",
+          "type": "array"
+        },
+        "capture_timestamp": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capture Timestamp"
+        },
+        "gps": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GPS"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "device": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Device"
+        }
+      },
+      "required": [
+        "original_dimensions"
+      ],
+      "title": "SourceMetadata",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "image_id": {
+      "title": "Image Id",
+      "type": "string"
+    },
+    "source_metadata": {
+      "$ref": "#/$defs/SourceMetadata"
+    },
+    "processing": {
+      "$ref": "#/$defs/Processing"
+    },
+    "detections": {
+      "items": {
+        "$ref": "#/$defs/DetectionOut"
+      },
+      "title": "Detections",
+      "type": "array"
+    },
+    "aggregates": {
+      "$ref": "#/$defs/Aggregates"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "image_id",
+    "source_metadata",
+    "processing",
+    "detections",
+    "aggregates",
+    "warnings"
+  ],
+  "title": "Packet",
+  "type": "object"
+}
